@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProposalAI — Freelancer Proposal Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f172a;--navy2:#1e293b;--navy3:#334155;
+  --gold:#f59e0b;--gold2:#fbbf24;--gold3:#fef3c7;
+  --white:#ffffff;--off:#f8fafc;--muted:#94a3b8;
+  --border:#e2e8f0;--green:#10b981;--red:#ef4444;
+  --radius:12px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;overflow-x:hidden}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:var(--navy2);border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column}
+.brand{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.brand-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.brand-icon{width:32px;height:32px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--navy)}
+.brand-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.3px}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.nav{padding:16px 12px;flex:1}
+.nav-section{font-size:10px;font-weight:500;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;padding:0 8px;margin-bottom:8px;margin-top:20px}
+.nav-section:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13.5px;color:rgba(255,255,255,0.65);transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--white)}
+.nav-item.active{background:rgba(245,158,11,0.15);color:var(--gold2)}
+.nav-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.usage-card{margin:12px;background:var(--navy3);border-radius:var(--radius);padding:14px;border:1px solid rgba(255,255,255,0.06)}
+.usage-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.usage-bar{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.usage-fill{height:100%;border-radius:2px;transition:width .4s;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.usage-text{font-size:12px;font-weight:500}
+.upgrade-btn{width:100%;padding:9px;background:var(--gold);color:var(--navy);font-family:'Syne',sans-serif;font-weight:700;font-size:12px;border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:10px;letter-spacing:0.3px}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:18px 28px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;background:var(--navy)}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.4px}
+.topbar-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#f97316);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--navy)}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-gold{background:rgba(245,158,11,0.15);color:var(--gold2);border:1px solid rgba(245,158,11,0.3)}
+.badge-green{background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3)}
+
+.content{flex:1;overflow-y:auto;padding:28px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-track{background:transparent}
+.content::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:2px}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.card{background:var(--navy2);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius);padding:22px;position:relative}
+.card-title{font-family:'Syne',sans-serif;font-weight:600;font-size:13px;color:var(--muted);letter-spacing:0.4px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block;font-weight:500;letter-spacing:0.2px}
+.form-textarea{width:100%;background:var(--navy);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--white);resize:none;outline:none;transition:border .15s;line-height:1.6}
+.form-textarea:focus{border-color:rgba(245,158,11,0.5)}
+.form-textarea::placeholder{color:var(--muted)}
+.char-count{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+.tone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:2px}
+.tone-btn{padding:9px 6px;background:var(--navy);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);cursor:pointer;transition:all .15s;text-align:center}
+.tone-btn:hover{border-color:rgba(245,158,11,0.4);color:var(--white)}
+.tone-btn.selected{background:rgba(245,158,11,0.12);border-color:var(--gold);color:var(--gold2);font-weight:500}
+.generate-btn{width:100%;padding:13px;background:var(--gold);color:var(--navy);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;border:none;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:0.3px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.generate-btn:hover{background:var(--gold2);transform:translateY(-1px)}
+.generate-btn:active{transform:translateY(0)}
+.generate-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+
+/* OUTPUT */
+.output-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:320px;text-align:center;gap:12px}
+.output-empty-icon{width:52px;height:52px;background:rgba(245,158,11,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,158,11,0.2)}
+.output-empty-title{font-family:'Syne',sans-serif;font-weight:600;font-size:15px;color:rgba(255,255,255,0.7)}
+.output-empty-sub{font-size:12px;color:var(--muted);max-width:200px;line-height:1.5}
+.output-content{display:none;flex-direction:column;height:100%}
+.output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.output-meta{display:flex;align-items:center;gap:8px}
+.word-badge{padding:3px 10px;background:rgba(255,255,255,0.06);border-radius:20px;font-size:11px;color:var(--muted)}
+.output-actions{display:flex;gap:6px}
+.action-btn{padding:7px 13px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.action-btn:hover{background:rgba(255,255,255,0.06);color:var(--white)}
+.action-btn.copied{background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:#34d399}
+.proposal-text{background:var(--navy);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:18px;font-size:14px;line-height:1.8;color:rgba(255,255,255,0.88);flex:1;min-height:220px;white-space:pre-wrap;word-break:break-word}
+.regen-btn{width:100%;margin-top:12px;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);cursor:pointer;transition:all .15s}
+.regen-btn:hover{background:rgba(255,255,255,0.04);color:var(--white)}
+
+/* HISTORY */
+.history-card{padding:14px 18px;background:var(--navy);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:14px}
+.history-card:hover{border-color:rgba(245,158,11,0.3)}
+.h-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.h-content{flex:1;min-width:0}
+.h-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.h-meta{font-size:11px;color:var(--muted)}
+.h-badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:500;flex-shrink:0}
+
+/* LOADING */
+.spinner{width:16px;height:16px;border:2px solid rgba(15,23,42,0.3);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.typing-dots{display:flex;gap:4px;align-items:center;justify-content:center;padding:20px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:bounce 1s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.8);opacity:0.5}40%{transform:scale(1.2);opacity:1}}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--navy2);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius);padding:16px 18px}
+.stat-label{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:500;letter-spacing:0.3px}
+.stat-value{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.5px}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-overlay.open{display:flex}
+.modal{background:var(--navy2);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px;width:360px;position:relative}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.modal-close:hover{background:rgba(255,255,255,0.06);color:var(--white)}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.modal-price{font-family:'Syne',sans-serif;font-weight:800;font-size:32px;margin-bottom:4px}
+.modal-price span{font-size:14px;font-weight:400;color:var(--muted)}
+.modal-features{list-style:none;margin:16px 0 20px;display:flex;flex-direction:column;gap:8px}
+.modal-features li{font-size:13px;color:rgba(255,255,255,0.8);display:flex;align-items:center;gap:8px}
+.check{width:16px;height:16px;background:rgba(16,185,129,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#34d399;font-size:10px;flex-shrink:0}
+.pay-btn{width:100%;padding:13px;background:var(--gold);color:var(--navy);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;border:none;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:0.3px}
+
+/* API KEY SETUP */
+.api-notice{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px}
+.api-notice-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.api-notice-text{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.6}
+.api-notice-text strong{color:var(--gold2)}
+.api-input-row{display:flex;gap:8px;margin-top:8px}
+.api-input{flex:1;background:var(--navy);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-sm);padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--white);outline:none}
+.api-input:focus{border-color:rgba(245,158,11,0.4)}
+.api-save-btn{padding:8px 14px;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+
+@media(max-width:768px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .two-col{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <div class="brand-icon">FP</div>
+        <div>
+          <div class="brand-name">ProposalAI</div>
+        </div>
+      </div>
+      <div class="brand-sub">Freelancer Proposal Generator</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Workspace</div>
+      <button class="nav-item active" onclick="showSection('generator')">
+        <div class="nav-dot" style="background:var(--gold)"></div> Generate
+      </button>
+      <button class="nav-item" onclick="showSection('history')">
+        <div class="nav-dot" style="background:#818cf8"></div> History
+      </button>
+      <div class="nav-section">Account</div>
+      <button class="nav-item" onclick="showSection('settings')">
+        <div class="nav-dot" style="background:var(--muted)"></div> Settings
+      </button>
+    </nav>
+    <div class="usage-card">
+      <div class="usage-label">Free plan usage</div>
+      <div class="usage-bar"><div class="usage-fill" id="usage-fill" style="width:0%"></div></div>
+      <div class="usage-text" id="usage-text">0 / 5 proposals used</div>
+      <button class="upgrade-btn" onclick="openModal()">Upgrade to Pro ↗</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Generate Proposal</div>
+        <div class="topbar-sub">Paste a job description. Get a personalised proposal in 10 seconds.</div>
+      </div>
+      <div class="topbar-right">
+        <span class="badge badge-gold" id="plan-badge">Free Plan</span>
+        <div class="avatar">AB</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- API KEY NOTICE -->
+      <div class="api-notice" id="api-notice">
+        <div class="api-notice-icon">🔑</div>
+        <div class="api-notice-text">
+          <strong>Connect your OpenAI API key to enable real AI generation.</strong><br>
+          Without it, demo proposals are shown. Get your key at platform.openai.com → API Keys.
+          <div class="api-input-row">
+            <input class="api-input" id="api-key-input" type="password" placeholder="sk-...your OpenAI API key...">
+            <button class="api-save-btn" onclick="saveApiKey()">Connect</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">PROPOSALS GENERATED</div>
+          <div class="stat-value" id="stat-total" style="color:var(--gold)">0</div>
+          <div class="stat-sub">This session</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">AVG WORD COUNT</div>
+          <div class="stat-value" id="stat-words" style="color:#818cf8">—</div>
+          <div class="stat-sub">Optimal: 120–180</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">FREE USES LEFT</div>
+          <div class="stat-value" id="stat-left" style="color:var(--green)">5</div>
+          <div class="stat-sub">Upgrade for unlimited</div>
+        </div>
+      </div>
+
+      <!-- GENERATOR -->
+      <div id="section-generator">
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title">Input Details</div>
+            <div class="form-group">
+              <label class="form-label">Job Description *</label>
+              <textarea class="form-textarea" id="job-desc" rows="6"
+                placeholder="Paste the Upwork/Fiverr job posting here...&#10;&#10;Example: Looking for a Python developer to build a data scraping tool for e-commerce product listings. Must handle anti-bot measures and deliver clean JSON output."
+                oninput="updateCount(this,'jd-count')"></textarea>
+              <div class="char-count" id="jd-count">0 characters</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Skills & Experience *</label>
+              <textarea class="form-textarea" id="bio" rows="4"
+                placeholder="Describe your relevant background...&#10;&#10;Example: 3 years Python developer. Built 20+ scrapers. Expert in BeautifulSoup, Scrapy, Selenium. 5-star ratings on 15 projects."
+                oninput="updateCount(this,'bio-count')"></textarea>
+              <div class="char-count" id="bio-count">0 characters</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Proposal Tone</label>
+              <div class="tone-grid">
+                <button class="tone-btn selected" onclick="setTone(this,'Professional')">Professional</button>
+                <button class="tone-btn" onclick="setTone(this,'Friendly')">Friendly</button>
+                <button class="tone-btn" onclick="setTone(this,'Bold')">Bold</button>
+              </div>
+            </div>
+            <button class="generate-btn" id="gen-btn" onclick="generate()">
+              ✦ &nbsp;Generate Proposal
+            </button>
+          </div>
+
+          <div class="card" style="display:flex;flex-direction:column">
+            <div class="card-title">Generated Proposal</div>
+            <div class="output-empty" id="out-empty">
+              <div class="output-empty-icon">✦</div>
+              <div class="output-empty-title">Ready to generate</div>
+              <div class="output-empty-sub">Fill the form and click Generate Proposal</div>
+            </div>
+            <div id="out-loading" style="display:none;flex:1;align-items:center;justify-content:center">
+              <div>
+                <div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">Writing your proposal...</div>
+              </div>
+            </div>
+            <div class="output-content" id="out-content">
+              <div class="output-header">
+                <div class="output-meta">
+                  <span class="badge badge-green" id="tone-badge">Professional</span>
+                  <span class="word-badge" id="word-badge">— words</span>
+                </div>
+                <div class="output-actions">
+                  <button class="action-btn" id="copy-btn" onclick="copyText()">⎘ &nbsp;Copy</button>
+                </div>
+              </div>
+              <div class="proposal-text" id="proposal-out"></div>
+              <button class="regen-btn" onclick="regen()">↻ &nbsp;Regenerate with different wording</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div id="section-history" style="display:none">
+        <div class="card">
+          <div class="card-title">Proposal History</div>
+          <div id="hist-list"></div>
+          <div id="hist-empty" style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No proposals yet. Generate your first one.</div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="section-settings" style="display:none">
+        <div class="card" style="max-width:480px">
+          <div class="card-title">Account & API Settings</div>
+          <div class="form-group">
+            <label class="form-label">OpenAI API Key</label>
+            <div style="display:flex;gap:8px">
+              <input type="password" class="form-textarea" id="settings-key" style="height:40px;padding:10px 14px" placeholder="sk-...">
+              <button class="generate-btn" style="width:auto;padding:0 16px;font-size:12px" onclick="saveApiKeyFromSettings()">Save</button>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">Your key is stored locally in your browser only. Never sent to any server.</div>
+          </div>
+          <div class="form-group" style="margin-top:8px">
+            <label class="form-label">Current Plan</label>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--navy);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm)">
+              <span style="font-size:13.5px" id="settings-plan">Free Plan</span>
+              <span class="badge badge-gold" style="margin-left:auto">5 proposals/month</span>
+            </div>
+          </div>
+          <button class="generate-btn" style="margin-top:8px" onclick="openModal()">Upgrade to Pro — ₹499/month</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div style="font-size:11px;color:var(--gold2);font-weight:500;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:8px">Upgrade to Pro</div>
+    <div class="modal-title">Unlimited Proposals</div>
+    <div class="modal-sub">Stop hitting the limit. Generate as many proposals as you need, any time.</div>
+    <div class="modal-price">₹499 <span>/ month</span></div>
+    <ul class="modal-features">
+      <li><div class="check">✓</div> Unlimited proposal generation</li>
+      <li><div class="check">✓</div> All 3 tone modes</li>
+      <li><div class="check">✓</div> Full history & export</li>
+      <li><div class="check">✓</div> Priority generation speed</li>
+    </ul>
+    <button class="pay-btn" onclick="mockPay()">Pay with Razorpay →</button>
+    <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:10px">Secured by Razorpay · Cancel anytime</div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let tone = 'Professional';
+let usageCount = 0;
+let totalWords = 0;
+let history = [];
+let apiKey = localStorage.getItem('openai_api_key') || '';
+let isPro = false;
+
+const DEMO = {
+  Professional: `I noticed you need a Python developer to build a high-performance web scraping tool for e-commerce data collection — this is exactly the kind of project I've delivered multiple times.
+
+Over the past 3 years I've built 20+ production scrapers handling anti-bot measures, rate limiting, and large-scale data extraction using BeautifulSoup, Scrapy, and Selenium. My last client needed 50,000 product records scraped daily from 3 different platforms — I delivered it in 6 days, fully documented, with a retry system built in.
+
+I'll start with a technical scoping call to understand your exact data requirements, then deliver a modular, well-commented codebase you can maintain yourself. Available to start immediately.
+
+What format do you need the output data in?`,
+  Friendly: `Hey! Your project is right in my wheelhouse — I've been building exactly this type of scraper for the past 3 years and genuinely enjoy the challenge of working around anti-bot systems.
+
+I've done 20+ of these for clients across e-commerce, real estate, and SaaS. One recent project involved scraping 50k+ product listings daily across 3 marketplaces — delivered on time with a 5-star review.
+
+I work clean, communicate daily, and don't disappear mid-project. Would love to jump on a quick call to understand your data needs before we dive in.
+
+What does your ideal timeline look like?`,
+  Bold: `3 years. 20+ scrapers. Zero failed deliveries. That's my track record with exactly this type of project.
+
+I've built high-volume e-commerce scrapers that handle Cloudflare, honeypots, and dynamic JS rendering — using BeautifulSoup, Scrapy, and Selenium depending on what the site demands. Not "I know how to use them" — I've shipped them to production for paying clients.
+
+I'll deliver your scraper faster than your deadline, cleaner than you expect, and with a retry system so it doesn't break when the site updates.
+
+One question before I send a full proposal: what's the expected daily volume of product records?`
+};
+
+// ── Init ───────────────────────────────────────────────────────────────────
+window.onload = function() {
+  if(apiKey) {
+    document.getElementById('api-notice').style.display = 'none';
+    document.getElementById('api-key-input').value = apiKey;
+    document.getElementById('settings-key').value = apiKey;
+  }
+};
+
+// ── UI helpers ─────────────────────────────────────────────────────────────
+function updateCount(el, id) {
+  document.getElementById(id).textContent = el.value.length + ' characters';
+}
+
+function setTone(btn, t) {
+  document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  tone = t;
+}
+
+function showSection(name) {
+  ['generator','history','settings'].forEach(s => {
+    document.getElementById('section-'+s).style.display = s===name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach((el,i) => {
+    el.classList.toggle('active', ['generator','history','settings'][i]===name);
+  });
+  if(name==='history') renderHistory();
+  if(name==='settings' && apiKey) document.getElementById('settings-key').value = apiKey;
+}
+
+function saveApiKey() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if(!k.startsWith('sk-')) { alert('Invalid API key. It should start with sk-'); return; }
+  apiKey = k;
+  localStorage.setItem('openai_api_key', k);
+  document.getElementById('api-notice').style.display = 'none';
+  document.getElementById('settings-key').value = k;
+  alert('✓ API key connected. Real AI generation is now active.');
+}
+
+function saveApiKeyFromSettings() {
+  const k = document.getElementById('settings-key').value.trim();
+  if(!k.startsWith('sk-')) { alert('Invalid API key.'); return; }
+  apiKey = k;
+  localStorage.setItem('openai_api_key', k);
+  document.getElementById('api-key-input').value = k;
+  document.getElementById('api-notice').style.display = 'none';
+  alert('✓ API key saved.');
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = usageCount;
+  document.getElementById('stat-left').textContent = isPro ? '∞' : Math.max(0, 5 - usageCount);
+  if(history.length > 0) {
+    const avg = Math.round(totalWords / history.length);
+    document.getElementById('stat-words').textContent = avg;
+  }
+  const pct = isPro ? 5 : Math.min(100, (usageCount/5)*100);
+  document.getElementById('usage-fill').style.width = pct + '%';
+  document.getElementById('usage-text').textContent = isPro
+    ? 'Unlimited · Pro Plan'
+    : usageCount + ' / 5 proposals used';
+}
+
+// ── Generate ───────────────────────────────────────────────────────────────
+async function generate() {
+  const jd  = document.getElementById('job-desc').value.trim();
+  const bio = document.getElementById('bio').value.trim();
+  if(!jd)  { alert('Please paste a job description.'); return; }
+  if(!bio) { alert('Please describe your skills and experience.'); return; }
+  if(!isPro && usageCount >= 5) { openModal(); return; }
+
+  document.getElementById('out-empty').style.display = 'none';
+  document.getElementById('out-content').style.display = 'none';
+  document.getElementById('out-loading').style.display = 'flex';
+  document.getElementById('gen-btn').disabled = true;
+  document.getElementById('gen-btn').innerHTML = '<div class="spinner"></div> Generating...';
+
+  try {
+    let text;
+    if(apiKey && apiKey.startsWith('sk-')) {
+      text = await callOpenAI(jd, bio, tone, apiKey);
+    } else {
+      await new Promise(r => setTimeout(r, 2000));
+      text = DEMO[tone];
+    }
+
+    const words = text.trim().split(/\s+/).length;
+    totalWords += words;
+    usageCount++;
+
+    document.getElementById('out-loading').style.display = 'none';
+    document.getElementById('out-content').style.display = 'flex';
+    document.getElementById('proposal-out').textContent = text;
+    document.getElementById('word-badge').textContent = words + ' words';
+    document.getElementById('tone-badge').textContent = tone;
+
+    history.unshift({ title: jd.substring(0,70)+'...', tone, words, text, date: new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'}) });
+    updateStats();
+
+    if(!isPro && usageCount >= 5) {
+      setTimeout(() => openModal(), 800);
+    }
+  } catch(err) {
+    document.getElementById('out-loading').style.display = 'none';
+    document.getElementById('out-empty').style.display = 'flex';
+    alert('Error: ' + (err.message || 'Something went wrong. Check your API key.'));
+  }
+
+  document.getElementById('gen-btn').disabled = false;
+  document.getElementById('gen-btn').innerHTML = '✦ &nbsp;Generate Proposal';
+}
+
+async function callOpenAI(jd, bio, tone, key) {
+  const toneInstructions = {
+    Professional: 'Write in a formal, credible, business tone. Structured and direct.',
+    Friendly: 'Write in a warm, conversational tone. Like talking to a colleague.',
+    Bold: 'Write in a confident, punchy tone. Lead with results. No fluff.'
+  };
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      max_tokens: 400,
+      temperature: 0.75,
+      messages: [
+        {
+          role: 'system',
+          content: `You are an elite freelancer with 10+ years experience winning proposals on Upwork and Fiverr. 
+You write proposals that are direct, personalised, and under 200 words. 
+You NEVER use generic phrases like "I am interested in your project" or "I am a perfect fit".
+You ALWAYS start with the client's specific pain point or a bold statement about your relevant experience.
+You ALWAYS end with a single, low-friction question that invites a reply.
+Tone: ${toneInstructions[tone]}`
+        },
+        {
+          role: 'user',
+          content: `Write a winning freelancer proposal for this job posting.
+
+JOB DESCRIPTION:
+${jd}
+
+MY SKILLS AND EXPERIENCE:
+${bio}
+
+Requirements:
+- Under 200 words
+- Personalised to THIS specific job (reference details from the JD)
+- End with one question that invites a reply
+- Do NOT use a subject line or greeting like "Dear Client"
+- Start directly with a strong opening sentence`
+        }
+      ]
+    })
+  });
+
+  if(!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || 'OpenAI API error ' + res.status);
+  }
+  const data = await res.json();
+  return data.choices[0].message.content.trim();
+}
+
+function regen() {
+  const tones = ['Professional','Friendly','Bold'];
+  const next = tones[(tones.indexOf(tone)+1) % 3];
+  tone = next;
+  document.querySelectorAll('.tone-btn').forEach(b => {
+    b.classList.toggle('selected', b.textContent === next);
+  });
+  const text = DEMO[next];
+  document.getElementById('proposal-out').textContent = text;
+  document.getElementById('word-badge').textContent = text.split(/\s+/).length + ' words';
+  document.getElementById('tone-badge').textContent = next;
+}
+
+function copyText() {
+  const text = document.getElementById('proposal-out').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '⎘  Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── History ────────────────────────────────────────────────────────────────
+function renderHistory() {
+  const list = document.getElementById('hist-list');
+  const empty = document.getElementById('hist-empty');
+  if(!history.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = history.map((h,i) => `
+    <div class="history-card" onclick="loadHistory(${i})">
+      <div class="h-dot"></div>
+      <div class="h-content">
+        <div class="h-title">${h.title}</div>
+        <div class="h-meta">${h.date} · ${h.words} words</div>
+      </div>
+      <span class="h-badge badge-gold badge">${h.tone}</span>
+    </div>`).join('');
+}
+
+function loadHistory(i) {
+  showSection('generator');
+  const h = history[i];
+  document.getElementById('out-empty').style.display = 'none';
+  document.getElementById('out-content').style.display = 'flex';
+  document.getElementById('proposal-out').textContent = h.text;
+  document.getElementById('word-badge').textContent = h.words + ' words';
+  document.getElementById('tone-badge').textContent = h.tone;
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────
+function openModal()  { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function mockPay() {
+  closeModal();
+  isPro = true;
+  document.getElementById('plan-badge').textContent = 'Pro Plan';
+  document.getElementById('plan-badge').className = 'badge badge-green';
+  document.getElementById('settings-plan').textContent = 'Pro Plan';
+  updateStats();
+  alert('Payment successful! You are now on Pro.\n(Demo mode — connect Razorpay key in production)');
+}
+document.getElementById('modal').addEventListener('click', function(e) {
+  if(e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
