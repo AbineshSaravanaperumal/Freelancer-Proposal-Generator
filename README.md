@@ -3,7 +3,7 @@
 AI-powered proposal generator for freelancers on Upwork and Fiverr.
 Paste a job description, get a personalised 120-180 word proposal in under 10 seconds.
 
-**[→ Live Demo](YOUR_VERCEL_URL_HERE)**
+**[→ Live Demo](https://freelancer-proposal-generator-krx9imyf9.vercel.app)**
 
 ![ProposalAI Screenshot](https://github.com/AbineshSaravanaperumal/Freelancer-Proposal-Generator/issues/1#issue-4355366638)
 
