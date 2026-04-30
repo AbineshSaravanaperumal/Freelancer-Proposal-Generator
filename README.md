@@ -5,7 +5,7 @@ Paste a job description, get a personalised 120-180 word proposal in under 10 se
 
 **[→ Live Demo](YOUR_VERCEL_URL_HERE)**
 
-![ProposalAI Screenshot](<img width="1919" height="925" alt="image" src="https://github.com/user-attachments/assets/74912fee-653e-45d0-bbfb-77ad35543540" />)
+![ProposalAI Screenshot](https://github.com/AbineshSaravanaperumal/Freelancer-Proposal-Generator/issues/1#issue-4355366638)
 
 ## The Problem
 Freelancers write the same proposal 20 times a day — manually, from scratch.
