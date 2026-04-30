@@ -1,5 +1,3 @@
-<img width="1919" height="925" alt="image" src="https://github.com/user-attachments/assets/74912fee-653e-45d0-bbfb-77ad35543540" />
-
 # ProposalAI — Freelancer Proposal Generator
 
 AI-powered proposal generator for freelancers on Upwork and Fiverr.
