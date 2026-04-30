@@ -29,4 +29,4 @@ Abinesh — 19-year-old Data Science student from Tamil Nadu.
 Building AI tools that run without me.
 
 
-Built by — Abinesh — 19-year-old Data Science student building AI products
+
